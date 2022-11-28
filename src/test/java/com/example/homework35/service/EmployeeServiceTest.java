@@ -1,32 +1,96 @@
 package com.example.homework35.service;
 
 import com.example.homework35.model.Employee;
+import com.example.homework35.record.EmployeeRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.example.homework35.constants.EmployeeServiceTestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EmployeeServiceTest {
 
+    public static final Integer KEY_NOT_EXIST = Integer.MAX_VALUE;
+    public static final EmployeeRequest NULL_FIRST_NAME = new EmployeeRequest(null, "Ivanov", 1, 10000);
+    public static final EmployeeRequest NULL_LAST_NAME = new EmployeeRequest("Ivan", null, 1, 10000);
+    public static final EmployeeRequest ILLEGAL_CHARACTERS_FIRST_NAME = new EmployeeRequest("Ivan1", "Ivanov", 1, 10000);
+    public static final EmployeeRequest ILLEGAL_CHARACTERS_LAST_NAME = new EmployeeRequest("Ivan", "Ivanov!!", 1, 10000);
+
     private final EmployeeService out = new EmployeeService();
+
+    private List<Employee> actualEmployees;
+
+    @BeforeEach
+    public void setUp() {
+        Employee ivan = new Employee("Ivan", "Ivanov", 1, 30000);
+        EmployeeRequest ivan_request = new EmployeeRequest("Ivan", "Ivanov", 1, 30000);
+        Employee petr = new Employee("Petr", "Petrov", 1, 10000);
+        EmployeeRequest petr_request = new EmployeeRequest("Petr", "Petrov", 1, 10000);
+        Employee nikolay = new Employee("Nikolay", "Nikolaev", 2, 25000);
+        EmployeeRequest nikolay_request = new EmployeeRequest("Nikolay", "Nikolaev", 2, 25000);
+        Employee vasiliy = new Employee("Vasiliy", "Vasiliev", 2, 15000);
+        EmployeeRequest vasiliy_request = new EmployeeRequest("Vasiliy", "Vasiliev", 2, 15000);
+
+        out.addEmployee(ivan_request);
+        out.addEmployee(petr_request);
+        out.addEmployee(nikolay_request);
+        out.addEmployee(vasiliy_request);
+
+        actualEmployees = new ArrayList<>(List.of(ivan, petr, nikolay, vasiliy));
+    }
+
+    public Employee findEmployee(int department) {
+        for (int i = 0; i < actualEmployees.size(); i++) {
+            if (actualEmployees.get(i).getId() == 3) {
+                Employee employee = new Employee(actualEmployees.get(i).getFirstName(),
+                        actualEmployees.get(i).getLastName(),
+                        actualEmployees.get(i).getDepartment(),
+                        actualEmployees.get(i).getSalary());
+                return employee;
+            }
+        }
+        return null;
+    }
+
+    public Employee findSalaryMin() {
+        double actual = Double.MAX_VALUE;
+        Employee employee = new Employee(null, null, 1, 1);
+        for (int i = 0; i < actualEmployees.size(); i++) {
+            if (actualEmployees.get(i).getSalary() < actual) {
+                actual = actualEmployees.get(i).getSalary();
+                employee = new Employee(actualEmployees.get(i).getFirstName(),
+                        actualEmployees.get(i).getLastName(),
+                        actualEmployees.get(i).getDepartment(),
+                        actualEmployees.get(i).getSalary());
+            }
+        }
+        return employee;
+    }
+
+    public Employee findSalaryMax() {
+        double actual = Double.MIN_VALUE;
+        Employee employee = new Employee(null, null, 1, 1);
+        for (int i = 0; i < actualEmployees.size(); i++) {
+            if (actualEmployees.get(i).getSalary() > actual) {
+                actual = actualEmployees.get(i).getSalary();
+                 employee = new Employee(actualEmployees.get(i).getFirstName(),
+                        actualEmployees.get(i).getLastName(),
+                        actualEmployees.get(i).getDepartment(),
+                        actualEmployees.get(i).getSalary());
+            }
+        }
+        return employee;
+    }
 
     @Test
     public void shouldReturnFindEmployeeCorrectlyDataEmployees() {
-        out.addEmployee(IVAN_REQUEST);
-        out.addEmployee(PETR_REQUEST);
-        out.addEmployee(NIKOLAY_REQUEST);
-        out.addEmployee(VASILIY_REQUEST);
-        Employee result = out.findEmployee(7);
-        assertEquals(NIKOLAY, result);
+        int departmentId = 7;
+        Employee check = findEmployee(3);
+        Employee result = out.findEmployee(departmentId);
+        assertEquals(check, result);
     }
-
-    @Test
-    public void shouldReturnAddEmployeesWhenCorrectlyDataEmployees() {
-        Employee result = out.addEmployee(NIKOLAY_REQUEST);
-        assertEquals(result, NIKOLAY);
-    }
-
 
     @Test
     public void shouldThrowIllegalArgumentExceptionWhenFirstNameIsNull() {
@@ -73,42 +137,39 @@ class EmployeeServiceTest {
 
     @Test
     public void shouldReturnSalaryWhenCorrectlyDataEmployees() {
-        out.addEmployee(IVAN_REQUEST);
-        out.addEmployee(PETR_REQUEST);
-        out.addEmployee(NIKOLAY_REQUEST);
-        out.addEmployee(VASILIY_REQUEST);
+        double actual = 0;
+        for (int i = 0; i < actualEmployees.size(); i++) {
+            actual += actualEmployees.get(i).getSalary();
+        }
         double result = out.getSalarySum();
-        assertEquals(IVAN.getSalary() + PETR.getSalary() + NIKOLAY.getSalary() + VASILIY.getSalary(), result);
+        assertEquals(actual, result);
     }
 
     @Test
     public void shouldReturnAverageSalaryWhenCorrectlyDataEmployees() {
-        out.addEmployee(IVAN_REQUEST);
-        out.addEmployee(PETR_REQUEST);
-        out.addEmployee(NIKOLAY_REQUEST);
-        out.addEmployee(VASILIY_REQUEST);
+        double actual = 0;
+        double sum = 0;
+        for (int i = 0; i < actualEmployees.size(); i++) {
+            sum += actualEmployees.get(i).getSalary();
+        }
+        actual = sum / actualEmployees.size();
         double result = out.getAverageSum();
-        assertEquals((IVAN.getSalary() + PETR.getSalary() + NIKOLAY.getSalary() + VASILIY.getSalary()) / 4, result);
+
+        assertEquals(actual, result);
     }
 
     @Test
     public void shouldReturnMinSalaryWhenCorrectlyDataEmployees() {
-        out.addEmployee(IVAN_REQUEST);
-        out.addEmployee(PETR_REQUEST);
-        out.addEmployee(NIKOLAY_REQUEST);
-        out.addEmployee(VASILIY_REQUEST);
+        Employee actual = findSalaryMin();
         Employee result = out.getSalaryMin();
-        assertEquals(PETR, result);
+        assertEquals(actual, result);
     }
 
     @Test
     public void shouldReturnMaxSalaryWhenCorrectlyDataEmployees() {
-        out.addEmployee(IVAN_REQUEST);
-        out.addEmployee(PETR_REQUEST);
-        out.addEmployee(NIKOLAY_REQUEST);
-        out.addEmployee(VASILIY_REQUEST);
+        Employee actual = findSalaryMax();
         Employee result = out.getSalaryMax();
-        assertEquals(IVAN, result);
+        assertEquals(actual, result);
     }
 
 

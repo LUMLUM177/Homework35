@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.Map;
 
 @RestController
 public class EmployeeController {
@@ -19,8 +20,8 @@ public class EmployeeController {
     }
 
     @GetMapping("/employees")
-    public Collection<Employee> getAllEmployees() {
-        return this.employeeService.getAllEmployees();
+    public Map<Integer, Employee> getEmployees() {
+        return this.employeeService.getEmployees();
     }
 
     @PostMapping("/employees")

@@ -5,9 +5,7 @@ import com.example.homework35.record.EmployeeRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class EmployeeService {
@@ -18,8 +16,12 @@ public class EmployeeService {
         return employees;
     }
 
-    public Collection<Employee> getAllEmployees() {
-        return this.employees.values();
+    public List<Employee> getEmployeesList() {
+        List<Employee> employees = new ArrayList<>();
+        for (Map.Entry<Integer, Employee> entry : getEmployees().entrySet()) {
+            employees.add(entry.getValue());
+        }
+        return employees;
     }
 
     public double getSalarySum() {
@@ -91,9 +93,29 @@ public class EmployeeService {
     }
 
     public Employee findEmployee(Integer key) {
-        if (!employees.containsKey(key)) {
-            throw new RuntimeException("Сотрудника с таким номером не существует");
+        for (int i = 0; i < getEmployeesList().size(); i++) {
+            if (getEmployeesList().get(i).getId() == key) {
+                Employee employee = new Employee(getEmployeesList().get(i).getFirstName(),
+                        getEmployeesList().get(i).getLastName(),
+                        getEmployeesList().get(i).getDepartment(),
+                        getEmployeesList().get(i).getSalary()
+                );
+                return employee;
+            }
         }
-        return employees.get(key);
+        throw new RuntimeException("Сотрудника с таким номером не существует");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EmployeeService that = (EmployeeService) o;
+        return Objects.equals(employees, that.employees);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(employees);
     }
 }

@@ -27,11 +27,24 @@ public class DepartmentService {
         return employeesInDepartment.values();
     }
 
+    public List<Employee> getAllEmployeesInDepartmentToList(int id) {
+        List<Employee> employees = new ArrayList<>();
+        for (int i = 0; i < employeeService.getEmployeesList().size(); i++) {
+            if (employeeService.getEmployeesList().get(i).getDepartment() == id) {
+                employees.add(employeeService.getEmployeesList().get(i));
+            }
+        }
+        if (employees.size() == 0) {
+            throw new RuntimeException("Сотрудников в этом департаменте нет!");
+        }
+        return employees;
+    }
+
     public double getSalarySumInDepartment(int id) {
         double sum = 0;
-        for (Map.Entry<Integer, Employee> entry : employeeService.getEmployees().entrySet()) {
-            if (entry.getValue().getDepartment() == id) {
-                sum += entry.getValue().getSalary();
+        for (int i = 0; i < employeeService.getEmployeesList().size(); i++) {
+            if (employeeService.getEmployeesList().get(i).getDepartment() == id) {
+                sum += employeeService.getEmployeesList().get(i).getSalary();
             }
         }
         return sum;
@@ -39,9 +52,10 @@ public class DepartmentService {
 
     public double getSalaryMaxInDepartment(int id) {
         double max = Double.MIN_VALUE;
-        for (Map.Entry<Integer, Employee> entry : employeeService.getEmployees().entrySet()) {
-            if (entry.getValue().getDepartment() == id && entry.getValue().getSalary() > max) {
-                max = entry.getValue().getSalary();
+        for (int i = 0; i < employeeService.getEmployeesList().size(); i++) {
+            if (employeeService.getEmployeesList().get(i).getDepartment() == id &&
+                    employeeService.getEmployeesList().get(i).getSalary() > max) {
+                max = employeeService.getEmployeesList().get(i).getSalary();
             }
         }
         return max;
@@ -49,9 +63,10 @@ public class DepartmentService {
 
     public double getSalaryMinInDepartment(int id) {
         double min = Double.MAX_VALUE;
-        for (Map.Entry<Integer, Employee> entry : employeeService.getEmployees().entrySet()) {
-            if (entry.getValue().getDepartment() == id && entry.getValue().getSalary() < min) {
-                min = entry.getValue().getSalary();
+        for (int i = 0; i < employeeService.getEmployeesList().size(); i++) {
+            if (employeeService.getEmployeesList().get(i).getDepartment() == id &&
+                    employeeService.getEmployeesList().get(i).getSalary() < min) {
+                min = employeeService.getEmployeesList().get(i).getSalary();
             }
         }
         return min;
@@ -59,14 +74,27 @@ public class DepartmentService {
 
     public Map<Integer, List<Employee>> getAllEmployees() {
         Map<Integer, List<Employee>> employeesInDepartment = new HashMap<>();
-        for (Map.Entry<Integer, Employee> entry : employeeService.getEmployees().entrySet()) {
+        for (int i = 0; i < employeeService.getEmployeesList().size(); i++) {
             List<Employee> employees = new ArrayList<>();
-            if (employeesInDepartment.containsKey(entry.getValue().getDepartment())) {
-                employees = employeesInDepartment.get(entry.getValue().getDepartment());
+            if (employeesInDepartment.containsKey(employeeService.getEmployeesList().get(i).getDepartment())) {
+                employees = employeesInDepartment.get(employeeService.getEmployeesList().get(i).getDepartment());
             }
-            employees.add(entry.getValue());
-            employeesInDepartment.put(entry.getValue().getDepartment(), employees);
+            employees.add(employeeService.getEmployeesList().get(i));
+            employeesInDepartment.put(employeeService.getEmployeesList().get(i).getDepartment(), employees);
         }
         return employeesInDepartment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DepartmentService that = (DepartmentService) o;
+        return Objects.equals(employeeService, that.employeeService);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(employeeService);
     }
 }
