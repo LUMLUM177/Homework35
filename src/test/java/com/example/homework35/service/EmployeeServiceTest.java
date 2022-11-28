@@ -17,6 +17,7 @@ class EmployeeServiceTest {
     public static final EmployeeRequest NULL_LAST_NAME = new EmployeeRequest("Ivan", null, 1, 10000);
     public static final EmployeeRequest ILLEGAL_CHARACTERS_FIRST_NAME = new EmployeeRequest("Ivan1", "Ivanov", 1, 10000);
     public static final EmployeeRequest ILLEGAL_CHARACTERS_LAST_NAME = new EmployeeRequest("Ivan", "Ivanov!!", 1, 10000);
+    public static final Employee NULL_EMPLOYEE_FOR_TEST = new Employee(null, null, 1, 1);
 
     private final EmployeeService out = new EmployeeService();
 
@@ -41,55 +42,20 @@ class EmployeeServiceTest {
         actualEmployees = new ArrayList<>(List.of(ivan, petr, nikolay, vasiliy));
     }
 
-    public Employee findEmployee(int department) {
-        for (int i = 0; i < actualEmployees.size(); i++) {
-            if (actualEmployees.get(i).getId() == 3) {
-                Employee employee = new Employee(actualEmployees.get(i).getFirstName(),
-                        actualEmployees.get(i).getLastName(),
-                        actualEmployees.get(i).getDepartment(),
-                        actualEmployees.get(i).getSalary());
-                return employee;
-            }
-        }
-        return null;
-    }
-
-    public Employee findSalaryMin() {
-        double actual = Double.MAX_VALUE;
-        Employee employee = new Employee(null, null, 1, 1);
-        for (int i = 0; i < actualEmployees.size(); i++) {
-            if (actualEmployees.get(i).getSalary() < actual) {
-                actual = actualEmployees.get(i).getSalary();
-                employee = new Employee(actualEmployees.get(i).getFirstName(),
-                        actualEmployees.get(i).getLastName(),
-                        actualEmployees.get(i).getDepartment(),
-                        actualEmployees.get(i).getSalary());
-            }
-        }
-        return employee;
-    }
-
-    public Employee findSalaryMax() {
-        double actual = Double.MIN_VALUE;
-        Employee employee = new Employee(null, null, 1, 1);
-        for (int i = 0; i < actualEmployees.size(); i++) {
-            if (actualEmployees.get(i).getSalary() > actual) {
-                actual = actualEmployees.get(i).getSalary();
-                 employee = new Employee(actualEmployees.get(i).getFirstName(),
-                        actualEmployees.get(i).getLastName(),
-                        actualEmployees.get(i).getDepartment(),
-                        actualEmployees.get(i).getSalary());
-            }
-        }
-        return employee;
-    }
-
     @Test
     public void shouldReturnFindEmployeeCorrectlyDataEmployees() {
         int departmentId = 7;
-        Employee check = findEmployee(3);
+        Employee actual = NULL_EMPLOYEE_FOR_TEST;
+        for (int i = 0; i < actualEmployees.size(); i++) {
+            if (actualEmployees.get(i).getId() == 3) {
+                actual = new Employee(actualEmployees.get(i).getFirstName(),
+                        actualEmployees.get(i).getLastName(),
+                        actualEmployees.get(i).getDepartment(),
+                        actualEmployees.get(i).getSalary());
+            }
+        }
         Employee result = out.findEmployee(departmentId);
-        assertEquals(check, result);
+        assertEquals(actual, result);
     }
 
     @Test
@@ -160,14 +126,36 @@ class EmployeeServiceTest {
 
     @Test
     public void shouldReturnMinSalaryWhenCorrectlyDataEmployees() {
-        Employee actual = findSalaryMin();
+        double min = Double.MAX_VALUE;
+        Employee actual = NULL_EMPLOYEE_FOR_TEST;
+        for (int i = 0; i < actualEmployees.size(); i++) {
+            if (actualEmployees.get(i).getSalary() < min) {
+                min = actualEmployees.get(i).getSalary();
+                actual = new Employee(actualEmployees.get(i).getFirstName(),
+                        actualEmployees.get(i).getLastName(),
+                        actualEmployees.get(i).getDepartment(),
+                        actualEmployees.get(i).getSalary());
+            }
+        }
+
         Employee result = out.getSalaryMin();
+
         assertEquals(actual, result);
     }
 
     @Test
     public void shouldReturnMaxSalaryWhenCorrectlyDataEmployees() {
-        Employee actual = findSalaryMax();
+        double max = Double.MIN_VALUE;
+        Employee actual = NULL_EMPLOYEE_FOR_TEST;
+        for (int i = 0; i < actualEmployees.size(); i++) {
+            if (actualEmployees.get(i).getSalary() > max) {
+                max = actualEmployees.get(i).getSalary();
+                actual = new Employee(actualEmployees.get(i).getFirstName(),
+                        actualEmployees.get(i).getLastName(),
+                        actualEmployees.get(i).getDepartment(),
+                        actualEmployees.get(i).getSalary());
+            }
+        }
         Employee result = out.getSalaryMax();
         assertEquals(actual, result);
     }
